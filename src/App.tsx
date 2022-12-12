@@ -1,6 +1,10 @@
 import React from "react";
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, set } from "firebase/database";
+import { GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
+import { useAuthState } from "react-firebase-hooks/auth";
+import firebase from "firebase/compat";
+import { Timestamp } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -19,16 +23,61 @@ const app = initializeApp(firebaseConfig);
 // Initialize Realtime Database and get a reference to the service
 const database = getDatabase(app);
 
+const auth = getAuth();
+
 function App() {
-  return <div className="App">
-    <button onClick={generateDocument}>Generate unique document</button>
-  </div>;
+  const [user] = useAuthState(auth);
+
+  return (
+    <div className="App">
+      <header className="App-header">
+        <p>User: {user ? "is logged in" : "is null"}</p>
+        <section>{user ? <LoggedIn /> : <SignIn />}</section>
+        <section>
+          <SignOut />
+        </section>
+      </header>
+    </div>
+  );
+}
+
+function SignIn() {
+  const provider = new GoogleAuthProvider();
+  const signInWithGoogle = () => {
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        console.log("Login successful");
+      })
+      .catch((error) => {
+        console.log(error.code);
+        console.log(error.message);
+      });
+  };
+
+  return <button onClick={signInWithGoogle}>Sign In With Google</button>;
+}
+
+function LoggedIn() {
+  let createdAt = Timestamp.fromDate(new Date()).toDate();
+
+  return (
+    <>
+      <p>In the chat room!</p>
+      <button onClick={generateDocument}>Generate unique document</button>
+    </>
+  );
+}
+
+function SignOut() {
+  return (
+    auth.currentUser && <button onClick={() => auth.signOut()}>Sign Out</button>
+  );
 }
 
 function generateString(length: number) {
   let result = "";
   const characters =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   const charactersLength = characters.length;
   for (let i = 0; i < length; i++) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
@@ -38,12 +87,13 @@ function generateString(length: number) {
 
 function generateDocument() {
   let randomString = generateString(5);
+  let createdAt = Timestamp.fromDate(new Date()).toDate();
 
-  set(ref(database, 'hello/'), {
-    testField: `${randomString}`
+  set(ref(database, "hello/"), {
+    testField: `${randomString}`,
+    newDate: `${createdAt}`,
   });
-  console.log(`Generated data: ${randomString}`)
+  console.log(`Generated data: ${randomString} at ${createdAt}`);
 }
-
 
 export default App;
