@@ -62,7 +62,7 @@ function LoggedIn() {
 
   return (
     <>
-      <p>In the chat room!</p>
+      <p>You are logged in!</p>
       <button onClick={generateDocument}>Generate unique document</button>
     </>
   );
