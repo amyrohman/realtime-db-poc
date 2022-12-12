@@ -3,14 +3,14 @@ import { initializeApp } from "firebase/app";
 import { getDatabase, ref, set } from "firebase/database";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCNiPxZg88ToKmS2-SdyLHK8SD1qrBm5IM",
-  authDomain: "rtdb-poc-563aa.firebaseapp.com",
-  databaseURL: "https://rtdb-poc-563aa-default-rtdb.firebaseio.com",
-  projectId: "rtdb-poc-563aa",
-  storageBucket: "rtdb-poc-563aa.appspot.com",
-  messagingSenderId: "368443448565",
-  appId: "1:368443448565:web:f2e2fca89c87a28eba79bc",
-  measurementId: "G-H1P6K2W5FN",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_AUTH_DOMAIN,
+  databaseURL: import.meta.env.VITE_DATABASE_URL,
+  projectId: import.meta.env.VITE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_APP_ID,
+  measurementId: import.meta.env.VITE_MEASUREMENT_ID,
 };
 
 // Initialize Firebase
