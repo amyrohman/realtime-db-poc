@@ -1,10 +1,11 @@
 import React from "react";
 import { initializeApp } from "firebase/app";
-import { getDatabase, ref, set } from "firebase/database";
-import { GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
+import { getDatabase } from "firebase/database";
+import { getAuth } from "firebase/auth";
 import { useAuthState } from "react-firebase-hooks/auth";
-import firebase from "firebase/compat";
-import { Timestamp } from "firebase/firestore";
+import SignOut from "./components/SignOut";
+import Dashboard from "./components/Dashboard";
+import SignIn from "./components/SignIn";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -16,13 +17,8 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_APP_ID,
   measurementId: import.meta.env.VITE_MEASUREMENT_ID,
 };
-
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-
-// Initialize Realtime Database and get a reference to the service
 const database = getDatabase(app);
-
 const auth = getAuth();
 
 function App() {
@@ -30,70 +26,15 @@ function App() {
 
   return (
     <div className="App">
-      <header className="App-header">
-        <p>User: {user ? "is logged in" : "is null"}</p>
-        <section>{user ? <LoggedIn /> : <SignIn />}</section>
-        <section>
-          <SignOut />
-        </section>
-      </header>
+      <p>User: {user ? "is logged in" : "is null"}</p>
+      <section>
+        {user ? <Dashboard database={database} /> : <SignIn auth={auth} />}
+      </section>
+      <section>
+        <SignOut auth={auth} />
+      </section>
     </div>
   );
-}
-
-function SignIn() {
-  const provider = new GoogleAuthProvider();
-  const signInWithGoogle = () => {
-    signInWithPopup(auth, provider)
-      .then((result) => {
-        console.log("Login successful");
-      })
-      .catch((error) => {
-        console.log(error.code);
-        console.log(error.message);
-      });
-  };
-
-  return <button onClick={signInWithGoogle}>Sign In With Google</button>;
-}
-
-function LoggedIn() {
-  let createdAt = Timestamp.fromDate(new Date()).toDate();
-
-  return (
-    <>
-      <p>You are logged in!</p>
-      <button onClick={generateDocument}>Generate unique document</button>
-    </>
-  );
-}
-
-function SignOut() {
-  return (
-    auth.currentUser && <button onClick={() => auth.signOut()}>Sign Out</button>
-  );
-}
-
-function generateString(length: number) {
-  let result = "";
-  const characters =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  const charactersLength = characters.length;
-  for (let i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-  }
-  return result;
-}
-
-function generateDocument() {
-  let randomString = generateString(5);
-  let createdAt = Timestamp.fromDate(new Date()).toDate();
-
-  set(ref(database, "hello/"), {
-    testField: `${randomString}`,
-    newDate: `${createdAt}`,
-  });
-  console.log(`Generated data: ${randomString} at ${createdAt}`);
 }
 
 export default App;
