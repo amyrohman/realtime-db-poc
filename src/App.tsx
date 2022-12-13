@@ -6,6 +6,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import SignOut from "./components/SignOut";
 import Dashboard from "./components/Dashboard";
 import SignIn from "./components/SignIn";
+import SignInAnonymous from "./components/SignInAnonymous";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -28,6 +29,7 @@ function App() {
     <div className="App">
       <p>User: {user ? "is logged in" : "is null"}</p>
       <section>
+        {/*{user ? <Dashboard database={database} /> : <SignInAnonymous auth={auth} />}*/}
         {user ? <Dashboard database={database} /> : <SignIn auth={auth} />}
       </section>
       <section>
